@@ -1,4 +1,25 @@
-<?php include 'db/config.php'; ?>
+<?php
+include 'db/config.php';
+include './lock.php';
+
+if (isset($_POST['login'])) {
+	$email_id = $_POST['email_id'];
+	$password = $_POST['password'];
+	$query = mysqli_query($conn, "select * from users where email_id='$email_id' and password='" . md5($password) . "' and is_active=1");
+	$record = mysqli_fetch_array($query);
+	$count = mysqli_num_rows($query);
+
+	if ($count == 1) {
+		$_SESSION['email_id'] = $record['email_id'];
+		$_SESSION['username'] = $record['username'];
+		sleep(1);
+		header('Location:' . BASE_URL . 'dashboard.php');
+	} else {
+		echo "incorrect login ID or password";
+	}
+}
+?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -19,11 +40,11 @@
 	<div class="d-flex flex-column flex-root">
 		<div class="d-flex flex-column flex-column-fluid bgi-position-y-bottom position-x-center bgi-no-repeat bgi-size-contain bgi-attachment-fixed" style="background-image: url('assets/media/illustrations/sketchy-1/14.png')">
 			<div class="d-flex flex-center flex-column flex-column-fluid p-10 pb-lg-20">
-				<a href="./index.html" class="mb-12">
+				<a href="index.php" class="mb-12">
 					<img alt="Logo" src="assets/media/logos/logo-1.svg" class="h-40px" />
 				</a>
 				<div class="w-lg-500px bg-body rounded shadow-sm p-10 p-lg-15 mx-auto">
-					<form action="ajax/login.php" class="form w-100" novalidate="novalidate" method="post" >
+					<form action="index.php" class="form w-100" novalidate="novalidate" method="post">
 						<div class="text-center mb-10">
 							<h1 class="text-dark mb-3">Sign In to Dinesh Arora</h1>
 						</div>
@@ -42,7 +63,7 @@
 						</div>
 
 						<div class="pb-lg-0 pb-5">
-							<button type="submit" id="kt_login_signin_submit" class="btn btn-primary font-weight-bolder font-size-h6 px-8 py-4 my-3 mr-3" name="login_submit">Log In</button>
+							<button type="submit" id="kt_login_signin_submit" class="btn btn-primary font-weight-bolder font-size-h6 px-8 py-4 my-3 mr-3" name="login">Log In</button>
 						</div>
 					</form>
 				</div>
